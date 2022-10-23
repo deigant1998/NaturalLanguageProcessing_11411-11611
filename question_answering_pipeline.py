@@ -1,5 +1,6 @@
 from passage_classify.PassageClassify import PassageClassifier
 from sentence_detect.SentenceDetect import SentenceDetectionModel
+from answer_generate.AnswerGenerate import T5AnswerGenerator
 
 file_name = "/Users/deigant/Desktop/CMU/CMU Course Materials/11-611/hw1/HW01/documents/indian_states/Gujarat.txt"
 
@@ -226,6 +227,11 @@ questions = [ "What religion is the most popular in Gujarat according to the 201
 "Gujarat was also known as Pratichya and Varuna?"]
 
 related_sentences = []
+
+answer_generator = T5AnswerGenerator()
+
+answers = []
+
 for question in questions:
     question_related_sentences = []
     passages = passage_classifier.get_related_passages(question)
@@ -236,4 +242,10 @@ for question in questions:
     print(question_related_sentences)
     print()
     related_sentences.append(question_related_sentences)
+
+    answer = answer_generator.answer_question(question, question_related_sentences)
+
+    print(answer)
+
+    answers.append(answer)
     
