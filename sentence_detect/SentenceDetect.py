@@ -206,10 +206,13 @@ class SentenceDetectionModel(nn.Module):
         result_sentence_indexes = ((output[0] > 0.1).nonzero().reshape(1, (output[0] > 0.1).nonzero().shape[0]))
         
         result = []
-        print(result_sentence_indexes)
         print(sentences)
         for result_sentence_index in result_sentence_indexes[0].tolist():
+            if(result_sentence_index > 0):
+                #Take preceding sentence
+                result.append(sentences[result_sentence_index - 1])
             result.append(sentences[result_sentence_index])
+            
         return result
             
 

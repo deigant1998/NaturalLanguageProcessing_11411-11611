@@ -1,10 +1,7 @@
 import pandas as pd
 from transformers import (
-    GPT2LMHeadModel,
-    GPT2Tokenizer,
     AutoTokenizer,
     AutoModelWithLMHead,
-    pipeline
 )
 import numpy as np
 import random
@@ -18,8 +15,8 @@ import csv
 class T5AnswerGenerator():
     def __init__(self):
         model_name = "MaRiOrOsSi/t5-base-finetuned-question-answering"
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelWithLMHead.from_pretrained(model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModelWithLMHead.from_pretrained(model_name)
 
     def _construct_prompt(
         self,
