@@ -14,7 +14,8 @@ import csv
 
 class T5AnswerGenerator():
     def __init__(self):
-        model_name = "MaRiOrOsSi/t5-base-finetuned-question-answering"
+        #model_name = "MaRiOrOsSi/t5-base-finetuned-question-answering"
+        model_name = "mzhou08/t5-base-finetuned-context-dataset"
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelWithLMHead.from_pretrained(model_name)
 

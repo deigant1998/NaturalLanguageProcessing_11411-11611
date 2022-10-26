@@ -6,6 +6,7 @@ import torch
 import random
 import math
 from torch.autograd.grad_mode import no_grad
+from torch.nn.functional import normalize
 
 def optimizer_to(optim, device):
     for param in optim.state.values():
@@ -30,8 +31,9 @@ class SentenceDetectionModel(nn.Module):
         
         self.tokenizer = XLNetTokenizer.from_pretrained("xlnet-base-cased", do_lower_case=True)
         self.xlnetModel = XLNetModel.from_pretrained('xlnet-base-cased').to(self.device, dtype=torch.float, non_blocking=True)
+        self.multi_head_attention_sentences = nn.ModuleList([nn.MultiheadAttention(self.embedding_size, 8) for i in range(10)])
         self.multi_head_attention_inter_sentence = nn.MultiheadAttention(self.embedding_size, 16)
-
+        
         self.hidden = nn.Linear((self.num_sentences) * self.embedding_size, 4000, bias=True).to(self.device, dtype=torch.float, non_blocking=True)
         self.activation = nn.Tanh().to(self.device, dtype=torch.float, non_blocking=True)
         self.dropout = nn.Dropout(0.5).to(self.device, dtype=torch.float, non_blocking=True)
@@ -93,11 +95,12 @@ class SentenceDetectionModel(nn.Module):
             sentence_end = ((i+1)*48)
             sentence = sentence_section_output[:,  sentence_start:sentence_end  , :];
             sentence = sentence.to(self.device).float()
-            sentence_tensor = torch.mean(sentence, 1)
+            sentence_attention_tensor = normalize(sentence + self.multi_head_attention_sentences[i](sentence,sentence,sentence)[0], p=2)
+            sentence_tensor = torch.mean(sentence_attention_tensor, 1)
             sentence_embeddings[0][i] = sentence_tensor
       
         sentence_embeddings = sentence_embeddings.to(self.device).float()
-        concat_sentence_attention = sentence_embeddings + self.multi_head_attention_inter_sentence(sentence_embeddings, sentence_embeddings,sentence_embeddings)[0]
+        concat_sentence_attention = normalize(sentence_embeddings + self.multi_head_attention_inter_sentence(sentence_embeddings, sentence_embeddings,sentence_embeddings)[0], p=2)
 
         
         hidden = self.dropout(self.activation(self.hidden(
@@ -206,11 +209,10 @@ class SentenceDetectionModel(nn.Module):
         result_sentence_indexes = ((output[0] > 0.1).nonzero().reshape(1, (output[0] > 0.1).nonzero().shape[0]))
         
         result = []
-        print(sentences)
         for result_sentence_index in result_sentence_indexes[0].tolist():
-            if(result_sentence_index > 0):
+            #if(result_sentence_index > 0):
                 #Take preceding sentence
-                result.append(sentences[result_sentence_index - 1])
+                #result.append(sentences[result_sentence_index - 1])
             result.append(sentences[result_sentence_index])
             
         return result
