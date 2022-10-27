@@ -36,8 +36,16 @@ class PassageClassifier(torch.nn.Module):
         return sentences
     
     def find_passage_start_and_end(self, sentence_index, len_sentences):
-        start = max(0, sentence_index - 5)
-        end = min(start + 10, len_sentences)
+        start = sentence_index - 5
+        end = start + 10
+        
+        if(start < 0):
+            start = 0
+            end = 10
+        elif (end > len_sentences):
+            end = len_sentences
+            start = len_sentences - 10
+        
         return start, end
     
     def get_related_passages(self, question):

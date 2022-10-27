@@ -1,10 +1,7 @@
 import pandas as pd
 from transformers import (
-    GPT2LMHeadModel,
-    GPT2Tokenizer,
     AutoTokenizer,
     AutoModelWithLMHead,
-    pipeline
 )
 import numpy as np
 import random
