@@ -7,6 +7,7 @@ import random
 import math
 from torch.autograd.grad_mode import no_grad
 from torch.nn.functional import normalize
+from transformers.utils import logging
 
 def optimizer_to(optim, device):
     for param in optim.state.values():
@@ -28,6 +29,8 @@ class SentenceDetectionModel(nn.Module):
         self.num_sentences = num_sentences
         self.embedding_size = 768
         self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        self.train_data_file = train_data_file
+        self.model_state_dict = model_state_dict
         
         self.tokenizer = XLNetTokenizer.from_pretrained("xlnet-base-cased", do_lower_case=True)
         self.xlnetModel = XLNetModel.from_pretrained('xlnet-base-cased').to(self.device, dtype=torch.float, non_blocking=True)
@@ -63,9 +66,9 @@ class SentenceDetectionModel(nn.Module):
         self.validation_dataset = None
         self.validation_error = None
         self.train_error =  None
-        
-        if(train_data_file is not None):
-            data = self.extract_data_from_file(train_data_file)
+
+        if(self.train_data_file is not None):
+            data = self.extract_data_from_file(self.train_data_file)
             random.shuffle(data)
             train_size = math.floor(0.8*len(data))
             val_size = math.floor(0.1*len(data))
@@ -76,10 +79,10 @@ class SentenceDetectionModel(nn.Module):
             self.validation_error = []
             self.train_error = []
             
-        if(model_state_dict is not None):
-            self.load_state_dict(torch.load(model_state_dict, map_location=torch.device('cpu')))
+        if(self.model_state_dict is not None):
+            self.load_state_dict(torch.load(self.model_state_dict, map_location=torch.device('cpu')))
             
-        if(model_state_dict is None and train_data_file is None):
+        if(self.model_state_dict is None and self.train_data_file is None):
             raise("Incorrect Parameters. Atlease one of model_state_dict or train_data_file required")
         
     def forward(self, input):
@@ -201,9 +204,9 @@ class SentenceDetectionModel(nn.Module):
             sentences.append(sent)
         return sentences;
     
-    def get_predicted_sentences(self, passage, question):
+    def get_predicted_sentences(self, sentences, question):
         self.eval()
-        sentences = self.split_passages(passage)
+        #sentences = self.split_passages(passage)
         tokenized_sentences = self.tokenize_sentences(sentences, question)
         output = self(tokenized_sentences)
         result_sentence_indexes = ((output[0] > 0.1).nonzero().reshape(1, (output[0] > 0.1).nonzero().shape[0]))

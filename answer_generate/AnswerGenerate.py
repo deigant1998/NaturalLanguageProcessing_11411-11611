@@ -1,27 +1,20 @@
-import pandas as pd
 from transformers import (
     AutoTokenizer,
-    AutoModelWithLMHead,
+    AutoModelForSeq2SeqLM,
 )
-import numpy as np
-import random
-import torch
-from torch.utils.data import Dataset, DataLoader
-from transformers import GPT2Tokenizer, GPT2LMHeadModel, AdamW, get_linear_schedule_with_warmup
-from tqdm import tqdm, trange
 import torch.nn.functional as F
-import csv
+from transformers.utils import logging
 
 class T5AnswerGenerator():
     def __init__(self):
-        model_name = "mzhou08/t5-base-finetuned-context-dataset"
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelWithLMHead.from_pretrained(model_name)
-
+        self.model_name = "mzhou08/t5-base-finetuned-context-dataset"
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
+        
     def _construct_prompt(
         self,
-        question: str,
-        relevant_sentences: list[str]
+        question,
+        relevant_sentences
     ) -> str:
             
         context = str(" ".join(relevant_sentences))
@@ -31,8 +24,8 @@ class T5AnswerGenerator():
 
     def answer_question(
         self,
-        question: str,
-        relevant_sentences: list[str]
+        question,
+        relevant_sentences
     ) -> str:
         input = self._construct_prompt(question, relevant_sentences)
 
@@ -48,8 +41,8 @@ class T5AnswerGenerator():
 
     def answer_questions(
         self,
-        questions: list[str],
-        relevant_sentences: list[list[str]]
+        questions,
+        relevant_sentences
     ):
 
         if len(questions) != len(relevant_sentences):
