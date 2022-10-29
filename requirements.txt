@@ -1,0 +1,8 @@
+torch
+SentencePiece
+sentence-transformers
+stanza
+transformers
+pandas
+
+
