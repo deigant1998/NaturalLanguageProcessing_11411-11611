@@ -7,7 +7,7 @@ from keyword_generate.KeywordGenerate import KeywordGenerate
 
 file_reader = FileRead.FileReader()
 question_generator = QuestionGenerate.QuestionGenerator()
-keywordGenerate = KeywordGenerate()
+#keywordGenerate = KeywordGenerate()
 
 CONTEXT_LENGTH = 6;
 
@@ -26,12 +26,12 @@ if __name__ == "__main__":
             break;
         for i in range(0, len(sentences) - CONTEXT_LENGTH, 3):
             relevant_sentences = ".".join(sentences[i : i + CONTEXT_LENGTH]);
-            keywords = keywordGenerate.get_keywords(relevant_sentences)
+            #keywords = keywordGenerate.get_keywords(relevant_sentences)
             question = question_generator.generate_question(relevant_sentences);
             
             if(question[-1] != '?' or question in questions):
                 continue
-            print(question, keywords)
+            print(question)
             questions.append(question)
             num_questions_generated += 1;
             if(num_questions_generated == nQuestions):
