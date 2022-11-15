@@ -4,5 +4,4 @@ sentence-transformers
 stanza
 transformers
 pandas
-
-
+keybert

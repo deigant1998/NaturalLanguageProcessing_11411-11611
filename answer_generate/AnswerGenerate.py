@@ -34,7 +34,7 @@ class T5AnswerGenerator():
                                     max_length=512,
                                     truncation=True)
         output = self.model.generate(input_ids = encoded_input.input_ids,
-                                    attention_mask = encoded_input.attention_mask)
+                                    attention_mask = encoded_input.attention_mask, max_new_tokens=256)
         output = self.tokenizer.decode(output[0], skip_special_tokens=True)
 
         return output
