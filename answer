@@ -4,22 +4,27 @@ from sentence_detect.SentenceDetect import SentenceDetectionModel
 from answer_generate.AnswerGenerate import T5AnswerGenerator
 import sys
 from transformers.utils import logging
-
-file_name = "/Users/deigant/Desktop/CMU/CMU Course Materials/11-611/hw1/HW01/documents/indian_states/Gujarat.txt"
-
+import csv
 
 if __name__ == "__main__":
     context_file_name = sys.argv[1]
     questions_file_name = sys.argv[2]
     logging.set_verbosity_error()
     logging.disable_progress_bar()
+    
     passage_classifier = PassageClassifier(context_file_name)
-    sentence_detection = SentenceDetectionModel(10, None, "sentence_detect/Model_doubleattention_3_hidden_layer_8_epochs_5e-6_dict_Try1.pt")
+    #print("Done load passage_classifier")
+    sentence_detection = SentenceDetectionModel(10, None, "sentence_detect/Model_doubleattention_3_hidden_layer_7_epochs_5e-6_dict_Try1.pt")
+    #print("Done load sentence_detection")
     answer_generator = T5AnswerGenerator()
-
+    #print("Done load answer_generator")
+    #keywordGenerate = KeywordGenerate()
+    
     related_sentences = []
     answers = []
     
+    #with open("extra_data_2.csv", "w") as extra_data:
+        #writer = csv.writer(extra_data)
     with open(questions_file_name) as questions_file:
         questions = questions_file.readlines()
         for question in questions:
@@ -29,8 +34,16 @@ if __name__ == "__main__":
             question_related_sentences.extend(sentences)
             related_sentences.append(question_related_sentences)
             answer = answer_generator.answer_question(question, question_related_sentences)
+            #print(question)
+            #print(question_related_sentences)
             print(answer)
-            answers.append(answer)
+            #answers.append(answer)
+            #with open("answers.txt", "w") as answer_file:
+            #    answer_file.write("\n".join(answers))
+            #print([question, "".join(question_related_sentences), keywordGenerate.get_keywords("".join(question_related_sentences))])
+            #writer.writerow([question, "".join(question_related_sentences), keywordGenerate.get_keywords("".join(question_related_sentences))])
+                
+            
 
     
     
