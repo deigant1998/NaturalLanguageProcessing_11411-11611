@@ -24,14 +24,27 @@ if __name__ == "__main__":
     for j in range(5):
         if(num_questions_generated == nQuestions):
             break;
-        for i in range(0, len(sentences) - CONTEXT_LENGTH, 3):
+        for i in range(0, len(sentences) - CONTEXT_LENGTH, CONTEXT_LENGTH):
             relevant_sentences = ".".join(sentences[i : i + CONTEXT_LENGTH]);
             #keywords = keywordGenerate.get_keywords(relevant_sentences)
             question = question_generator.generate_question(relevant_sentences);
             
+            if len(question) == 0:
+                continue
+            
+            if(len(question.split(' ')) >= 2 and (question.split(' ')[0].lower() == "question:" or question.split(' ')[0].lower() == "answer:")):
+                question = question.split(' ', 1)[1]
+                
+            if(question[0] == "?"):
+                question = question[1:]
+                
             if(question[-1] != '?' or question in questions):
                 continue
-            print(question)
+            
+            if len(question.strip()) == 0:
+                continue
+            
+            print(question.strip())
             questions.append(question)
             num_questions_generated += 1;
             if(num_questions_generated == nQuestions):
