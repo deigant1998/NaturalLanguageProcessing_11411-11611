@@ -22,6 +22,7 @@ if __name__ == "__main__":
     questions = []
     
     for j in range(5):
+        CONTEXT_LENGTH -= j
         if(num_questions_generated == nQuestions):
             break;
         for i in range(0, len(sentences) - CONTEXT_LENGTH, CONTEXT_LENGTH):

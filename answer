@@ -41,7 +41,7 @@ if __name__ == "__main__":
             #with open("answers.txt", "w") as answer_file:
             #    answer_file.write("\n".join(answers))
             #print([question, "".join(question_related_sentences), keywordGenerate.get_keywords("".join(question_related_sentences))])
-            #writer.writerow([question, "".join(question_related_sentences), keywordGenerate.get_keywords("".join(question_related_sentences))])
+            #writer.writerow([question, "".join(question_related_sentences)])
                 
             
 
