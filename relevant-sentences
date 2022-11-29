@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+from passage_classify.PassageClassify import PassageClassifier
+from sentence_detect.SentenceDetect import SentenceDetectionModel
+from answer_generate.AnswerGenerate import T5AnswerGenerator
+import sys
+from transformers.utils import logging
+import csv
+import pandas as pd
+
+DATA_PATH = "../HW01/documents"
+
+if __name__ == "__main__":
+    logging.set_verbosity_error()
+    logging.disable_progress_bar()
+
+    # utils/medium-hard-questions.csv
+    question_file_path = sys.argv[1]
+
+    question_df = pd.read_csv(question_file_path)
+
+    question_gb = question_df.groupby(['document_id'])
+
+    try:
+        sentences_output = pd.read_csv("data/relevant_sentences.csv")
+    except FileNotFoundError:
+        sentences_output = pd.DataFrame(columns=['Question', 'related_sentences'])
+
+    for name, group in question_gb:
+
+
+        context_file_name = name
+    
+        passage_classifier = PassageClassifier(DATA_PATH + context_file_name)
+    
+        sentence_detection = SentenceDetectionModel(10, None, "sentence_detect/Model_doubleattention_3_hidden_layer_7_epochs_5e-6_dict_Try1.pt")
+        answer_generator = T5AnswerGenerator()
+        #keywordGenerate = KeywordGenerate()
+    
+        related_sentences = []
+        answers = []
+    
+        for idx, row in group.iterrows():
+            question = row["question"]
+            question_related_sentences = []
+
+            passage = passage_classifier.get_related_passages(question)
+            sentences = sentence_detection.get_predicted_sentences(passage, question)
+            question_related_sentences.extend(sentences)
+            related_sentences.append(question_related_sentences)
+            answer = answer_generator.answer_question(question, question_related_sentences)
+            # print(question)
+            # print(question_related_sentences)
+            # print(answer)
+            sentences_output = pd.concat(
+                [
+                    sentences_output,
+                    pd.DataFrame(
+                        [{
+                            "Question": question,
+                            "related_sentences": " ".join(question_related_sentences)
+                        }]
+                    )
+                ]
+            )
+
+    sentences_output.to_csv("data/relevant_sentences.csv")
