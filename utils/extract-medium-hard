@@ -16,7 +16,7 @@ if __name__ == "__main__":
     answers = []
 
     try:
-        questions_output = pd.read_csv("medium-hard-questions.csv")
+        questions_output = pd.read_csv("../data/medium-hard-questions.csv")
     except FileNotFoundError:
         questions_output = pd.DataFrame(columns=['document_id', 'question', 'answer', 'difficulty'])
     
@@ -42,4 +42,4 @@ if __name__ == "__main__":
         ]
     )
 
-    questions_output.to_csv("medium-hard-questions.csv", index=False)
+    questions_output.to_csv("../data/medium-hard-questions.csv", index=False)
