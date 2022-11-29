@@ -3,6 +3,7 @@
 import sys
 from transformers.utils import logging
 import csv
+import pandas as pd
 
 DATA_PATH = "../../HW01/documents"
 
@@ -13,21 +14,47 @@ if __name__ == "__main__":
     
     related_sentences = []
     answers = []
+
+    try:
+        questions_output = pd.read_csv("medium-hard-questions.csv")
+    except FileNotFoundError:
+        questions_output = pd.DataFrame(columns=['document_id', 'question', 'answer', 'difficulty'])
     
-    with open("medium-hard-questions.csv", "a") as questions_file:
-        writer = csv.writer(questions_file)
-        with open("../data/qa_dataset-0.1.csv") as questions_data:
-            questions = questions_data.readlines()
-            for question in questions[1:]:
-                q_cols = question.split(",")
-                print(q_cols)
-                if (
-                    q_cols[1] == context_file_name
-                    and q_cols[4].strip() in ["M", "H"]
-                ):
-                    writer.writerow([
-                        question,
-                    ])
+    questions_df = pd.read_csv("../data/qa_dataset-0.1.csv")
+    
+    questions_df['difficulty'] = questions_df['difficulty'].str.strip()
+    questions_df = questions_df.drop(columns=['Unnamed: 0'])
+
+    relevant_df = questions_df[
+        (questions_df['document_id'] == context_file_name)
+        & (questions_df['difficulty'] != 'E')
+    ]
+
+    questions_output.reset_index(drop=True, inplace=True)
+    relevant_df.reset_index(drop=True, inplace=True)
+
+    print(relevant_df)
+
+    questions_output = pd.concat(
+        [
+            questions_output,
+            relevant_df
+        ]
+    )
+
+    questions_output.to_csv("medium-hard-questions.csv", index=False)
+
+    # with open("medium-hard-questions.csv", "a") as questions_file:
+    #     writer = csv.writer(questions_file, quoting = csv.QUOTE_MINIMAL)
+    #     with open("../data/qa_dataset-0.1.csv") as questions_data:
+    #         questions = questions_data.readlines()
+    #         for question in questions[1:]:
+    #             q_cols = question.split(",")
+    #             if (
+    #                 q_cols[1] == context_file_name
+    #                 and q_cols[4].strip() in ["M", "H"]
+    #             ):
+    #                 writer.writerow([question])
                 
             
 
