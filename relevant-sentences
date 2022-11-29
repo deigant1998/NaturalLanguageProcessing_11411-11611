@@ -63,4 +63,4 @@ if __name__ == "__main__":
                 ]
             )
 
-    sentences_output.to_csv("data/relevant_sentences.csv")
+        sentences_output.to_csv("data/relevant_sentences.csv", index=False)
