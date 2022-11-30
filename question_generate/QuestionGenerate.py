@@ -6,7 +6,7 @@ from transformers import (
 
 class QuestionGenerator():
     def __init__(self):
-        self.model_name = "Deigant/t5-base-finetuned-qg-context-dataset-2"
+        self.model_name = "Deigant/t5-base-finetuned-qg-hard-medium"
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
         

@@ -3,10 +3,14 @@ import sys
 from utils import FileRead
 from question_generate import QuestionGenerate
 from keyword_generate.KeywordGenerate import KeywordGenerate
+from sentence_transformers import SentenceTransformer, util
+from torch.nn import CosineSimilarity
 
 
 file_reader = FileRead.FileReader()
 question_generator = QuestionGenerate.QuestionGenerator()
+sentence_embedding_model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
+cos_sim = CosineSimilarity(dim = 0)
 #keywordGenerate = KeywordGenerate()
 
 CONTEXT_LENGTH = 6;
@@ -20,6 +24,7 @@ if __name__ == "__main__":
     
     num_questions_generated = 0;
     questions = []
+    embeddings = []
     
     for j in range(5):
         CONTEXT_LENGTH -= j
@@ -45,8 +50,21 @@ if __name__ == "__main__":
             if len(question.strip()) == 0:
                 continue
             
+            question_embedding = sentence_embedding_model.encode(question, convert_to_tensor=True)
+            question_too_similar = False
+            
+            for embedding in embeddings:
+                similarity = cos_sim(embedding, question_embedding)
+                if(similarity > 0.8):
+                    question_too_similar = True
+                    break
+                    
+            if(question_too_similar):
+                continue
+            
             print(question.strip())
             questions.append(question)
+            embeddings.append(question_embedding)
             num_questions_generated += 1;
             if(num_questions_generated == nQuestions):
                 break;
