@@ -13,7 +13,7 @@ sentence_embedding_model = SentenceTransformer('sentence-transformers/all-mpnet-
 cos_sim = CosineSimilarity(dim = 0)
 #keywordGenerate = KeywordGenerate()
 
-CONTEXT_LENGTH = 6;
+STARTING_CONTEXT_LENGTH = 6;
 
 
 if __name__ == "__main__":
@@ -27,10 +27,10 @@ if __name__ == "__main__":
     embeddings = []
     
     for j in range(5):
-        CONTEXT_LENGTH -= j
+        CONTEXT_LENGTH = STARTING_CONTEXT_LENGTH - j
         if(num_questions_generated == nQuestions):
             break;
-        for i in range(0, len(sentences) - CONTEXT_LENGTH, CONTEXT_LENGTH):
+        for i in range(0, len(sentences) - CONTEXT_LENGTH + 1, CONTEXT_LENGTH):
             relevant_sentences = ".".join(sentences[i : i + CONTEXT_LENGTH]);
             #keywords = keywordGenerate.get_keywords(relevant_sentences)
             question = question_generator.generate_question(relevant_sentences);
